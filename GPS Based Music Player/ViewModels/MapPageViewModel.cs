@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Linq;
 using System.Text;
 
@@ -19,11 +20,9 @@ namespace GPSBasedMusicPlayer
         private List<Position> addPointsList;
         private Polyline tempLine;
 
-        public MapPageViewModel(MainPageViewModel model)
+        public MapPageViewModel(MainPageViewModel model, Position pos)
         {
-            updateCurrentLocation();
-            Position position = getLatLong();
-            MapSpan mapSpan = new MapSpan(position, 0.01, 0.01);
+            MapSpan mapSpan = new MapSpan(pos, 0.01, 0.01);
             buttonMode = "newZone";
             ButtonText = "ADD ZONE";
             addPointsList = new List<Position>();
@@ -41,7 +40,7 @@ namespace GPSBasedMusicPlayer
             tempLine.StrokeColor = Color.FromHex("#FFAA00");
             map.MapElements.Add(tempLine);
 
-            ZoneAddCommand = new Command(async () =>
+            ZoneAddCommand = new Command(() =>
             {
                 ButtonPressed();
             });
@@ -136,7 +135,7 @@ namespace GPSBasedMusicPlayer
         {
             return new Position(latitude, longitude);
         }
-        public static async void updateCurrentLocation()
+        public static async Task<Position> updateCurrentLocation()
         {
             try
             {
@@ -145,8 +144,7 @@ namespace GPSBasedMusicPlayer
                 if (location != null)
                 {
                     Console.WriteLine($"Latitude: {location.Latitude}, Longitude: {location.Longitude}, Altitude: {location.Altitude}");
-                    latitude = location.Latitude;
-                    longitude = location.Longitude;
+                    return new Position(location.Latitude, location.Longitude);
                 }
             }
             catch (FeatureNotSupportedException fnsEx)
@@ -165,6 +163,7 @@ namespace GPSBasedMusicPlayer
             {
                 Console.WriteLine(ex);
             }
+            return new Position(0,0);
         }
 
 

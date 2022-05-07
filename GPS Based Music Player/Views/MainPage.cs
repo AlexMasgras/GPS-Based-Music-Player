@@ -50,7 +50,7 @@ namespace GPSBasedMusicPlayer
                 FontSize = 20,
                 Margin = new Thickness(1)
             };
-            songLabel.SetBinding(Label.TextProperty, nameof(MainPageViewModel.CurrentSong));
+            //songLabel.SetBinding(Label.TextProperty, nameof(MainPageViewModel.CurrentSong));
 
             zoneLabel = new Label
             {

@@ -4,6 +4,7 @@ using System.Text;
 using Xamarin.Essentials;
 using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
 using MediaManager;
 
 namespace GPSBasedMusicPlayer
@@ -36,6 +37,10 @@ namespace GPSBasedMusicPlayer
                     }
                 }
             }
+
+            Random rnd = new Random();
+            s = s.OrderBy(a => rnd.Next()).ToList();
+            rnd = null;
 
             await CrossMediaManager.Current.Play(s);
         }

@@ -14,10 +14,9 @@ namespace GPSBasedMusicPlayer
     {
         public PlaylistPageViewModel(Playlist list)
         {
-            AddNew = new Command(async () =>
+            AddNew = new Command(() =>
             {
                 ButtonClicked(list);
-
             });
 
         }

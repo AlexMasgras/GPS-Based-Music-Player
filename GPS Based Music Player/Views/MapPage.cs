@@ -13,11 +13,10 @@ namespace GPSBasedMusicPlayer
     {
         Button addButton;
         public MapPageViewModel cxt;
-        public MapPage(MainPageViewModel model)
+        public MapPage(MainPageViewModel model, Position pos)
         {
-            cxt = new MapPageViewModel(model);
+            cxt = new MapPageViewModel(model, pos);
             BindingContext = cxt;
-            
 
             addButton = new Button
             {
