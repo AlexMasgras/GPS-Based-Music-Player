@@ -14,7 +14,10 @@ namespace GPSBasedMusicPlayer
             AddNew = new Command( async () =>
             {
                 string result = await Application.Current.MainPage.DisplayPromptAsync("Playlist Creation", "Name your Playlist");
-                model.masterList.Add(new Playlist(result));
+                Playlist p = new Playlist(result);
+                model.masterList.Add(p);
+                model.zoneList[model.refZone].Add(p);
+                model.save();
             });
             
         }

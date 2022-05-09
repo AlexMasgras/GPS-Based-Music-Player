@@ -51,7 +51,7 @@ namespace GPSBasedMusicPlayer
                 {
                     drawCircle(entry.Key.coords);
                 }
-                else
+                else if(entry.Key.type.Equals("Polygon"))
                 {
                     drawPolygon(entry.Key.coords);
                 }
@@ -188,6 +188,7 @@ namespace GPSBasedMusicPlayer
 
             GeoZone zone = new GeoZone(name, "Polygon", new List<Position>(p));
             model.AddZone(zone);
+            model.save();
         }
 
         public void drawCircle(List<Position> p)
@@ -209,6 +210,7 @@ namespace GPSBasedMusicPlayer
 
             GeoZone zone = new GeoZone(name, "Circle", new List<Position>(p));
             model.AddZone(zone);
+            model.save();
         }
     }
 }

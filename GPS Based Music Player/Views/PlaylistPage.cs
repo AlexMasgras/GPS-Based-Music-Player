@@ -27,7 +27,7 @@ namespace GPSBasedMusicPlayer
             newButton.SetBinding(Button.CommandProperty, nameof(MusicPageViewModel.AddNew));
 
             songs = new ListView();
-            songs.ItemsSource = list;
+            songs.ItemsSource = list.getSongs();
             songs.ItemTapped += OnTap;
 
             var grid = new Grid

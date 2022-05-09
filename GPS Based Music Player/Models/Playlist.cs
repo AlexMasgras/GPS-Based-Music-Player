@@ -4,17 +4,20 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text;
 
+using Newtonsoft.Json;
+
 namespace GPSBasedMusicPlayer
 {
-    public class Playlist : List<Song>, INotifyCollectionChanged
+    public class Playlist : INotifyCollectionChanged
     {
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        private string name { get; set; }
-        private int position { get; set; }
+        public string name { get; set; }
+        public int position { get; set; }
 
         private List<string> refList;
         private List<GeoZone> boundZones;
+        public List<Song> songs;
 
         public Playlist(string name)
         {
@@ -22,20 +25,51 @@ namespace GPSBasedMusicPlayer
             position = 0;
             refList = new List<string>();
             boundZones = new List<GeoZone>();
+            songs = new List<Song>();
         }
 
-        public new void Add(Song s)
+        public Playlist(List<string> jsondata)
         {
-            base.Add(s);
+            name = jsondata[0];
+            jsondata.RemoveAt(0);
+
+            position = int.Parse(jsondata[0]);
+            jsondata.RemoveAt(0);
+
+            songs = new List<Song>();
+            refList = new List<string>();
+            foreach (String t in jsondata)
+            {
+                Song s = JsonConvert.DeserializeObject<Song>(t);
+                songs.Add(s);
+                refList.Add(s.GetRef());
+            }
+
+            boundZones = new List<GeoZone>();
+        }
+
+        public void Add(Song s)
+        {
+            songs.Add(s);
             CollectionChanged.Invoke(this, new NotifyCollectionChangedEventArgs(0, s));
             refList.Add(s.GetRef());
         }
 
-        public new void Remove(Song s)
+        public void Remove(Song s)
         {
-            refList.RemoveAt(base.IndexOf(s));
-            base.Remove(s);
+            refList.RemoveAt(songs.IndexOf(s));
+            songs.Remove(s);
             CollectionChanged.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, this));
+        }
+
+        public int Size()
+        {
+            return songs.Count;
+        }
+
+        public List<Song> getSongs()
+        {
+            return new List<Song>(songs);
         }
 
         public void onSongRename(Song s)
@@ -45,7 +79,10 @@ namespace GPSBasedMusicPlayer
 
         public void onZoneBind(GeoZone z)
         {
-            boundZones.Add(z);
+            if (z.type.Equals("Circle") || z.type.Equals("Polygon"))
+            {
+                boundZones.Add(z);
+            }
         }
 
         public void onZoneUnbind(GeoZone z)
@@ -84,6 +121,37 @@ namespace GPSBasedMusicPlayer
         public override string ToString()
         {
             return name;
+        }
+
+        public string serialize()
+        {
+            List<string> serList = new List<string>();
+            serList.Add(name);
+            serList.Add(position.ToString());
+            foreach(Song s in songs)
+            {
+                serList.Add(JsonConvert.SerializeObject(s));
+            }
+
+            return JsonConvert.SerializeObject(serList);
+        }
+
+        public bool functionallyEquals(Playlist other)
+        {
+            if(!name.Equals(other.name))
+            {
+                return false;
+            }
+
+            for(int i = 0; i < songs.Count; i++)
+            {
+                if(!songs[i].Equals(other.songs[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

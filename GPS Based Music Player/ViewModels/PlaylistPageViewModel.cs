@@ -31,7 +31,7 @@ namespace GPSBasedMusicPlayer
 
                 if(result != null)
                 {
-                list.Add(new Song(type, name, await StoreAudioFile(result.OpenReadAsync(), name)));
+                    list.Add(new Song(type, name, await StoreAudioFile(result.OpenReadAsync(), name)));
                 }
 
             //}

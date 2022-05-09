@@ -65,7 +65,22 @@ namespace GPSBasedMusicPlayer
                 });
 
                 bool add = action.Equals("Assign to Zone");
-                ZoneSelectionMenu zoneMenu = new ZoneSelectionMenu(add ? baseModel.zoneList.Keys.ToList() : ((Playlist)e.Item).getBoundZones(), add);
+                List<GeoZone> list = add ? new List<GeoZone>(baseModel.zoneList.Keys.ToList()) : ((Playlist)e.Item).getBoundZones();
+
+                if(add)
+                {
+                    List<GeoZone> toDisplay = new List<GeoZone>();
+                    foreach (GeoZone zone in list)
+                    {
+                        if(zone.ToString() != null && !((Playlist)e.Item).getBoundZones().Contains(zone))
+                        {
+                            toDisplay.Add(zone);
+                        }
+                    }
+                    list = toDisplay;
+                }
+
+                ZoneSelectionMenu zoneMenu = new ZoneSelectionMenu(list, add);
                 await Application.Current.MainPage.Navigation.PushModalAsync(zoneMenu);
                 return;
             }

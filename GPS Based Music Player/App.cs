@@ -18,5 +18,10 @@ namespace GPSBasedMusicPlayer
 
             MainPage = navigationPage;
         }
+
+        protected override void OnSleep()
+        {
+            base.OnSleep();
+        }
     }
 }

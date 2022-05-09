@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using System.Linq;
 using System.Text;
 using MediaManager;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
+using Xamarin.Essentials;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace GPSBasedMusicPlayer
 {
@@ -17,10 +21,57 @@ namespace GPSBasedMusicPlayer
         public Dictionary<GeoZone, List<Playlist>> zoneList { get; }
 
         private List<GeoZone> currentZones;
+
+        public GeoZone refZone;
         public MainPageViewModel()
         {
             zoneList = new Dictionary<GeoZone, List<Playlist>>();
+            masterList = new ObservableCollection<Playlist>();
             currentZones = new List<GeoZone>();
+
+            //deserialize
+            if (File.Exists(Path.Combine(FileSystem.AppDataDirectory + "/data.json")))
+            {
+                string file = Path.Combine(FileSystem.AppDataDirectory + "/data.json");
+
+                string fileContents = File.ReadAllText(file);
+
+                Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(fileContents);
+
+                foreach (string z in data.Keys)
+                {
+                    GeoZone zone = JsonConvert.DeserializeObject<GeoZone>(z);
+                    List<Playlist> lists = new List<Playlist>();
+                    foreach(string p in JsonConvert.DeserializeObject<List<string>>(data[z]))
+                    {
+                        Playlist pl = new Playlist(JsonConvert.DeserializeObject<List<string>>(p));
+
+                        bool containsDupe = false;
+                        foreach(Playlist plt in masterList)
+                        {
+                            if(pl.functionallyEquals(plt))
+                            {
+                                containsDupe = true;
+                                lists.Add(plt);
+                                plt.onZoneBind(zone);
+                                break;
+                            }
+                        }
+
+                        if(!containsDupe)
+                        {
+                            lists.Add(pl);
+                            masterList.Add(pl);
+                            pl.onZoneBind(zone);
+                        }
+                    }
+                    zoneList.Add(zone, lists);
+                }
+            }
+            else
+            {
+                zoneList.Add(refZone = new GeoZone(null, "REFERENCE", new List<Position>()), new List<Playlist>());
+            }
 
             MapMenuCommand = new Command(async () =>
             {
@@ -35,7 +86,6 @@ namespace GPSBasedMusicPlayer
                 await Application.Current.MainPage.Navigation.PushAsync(new MusicPage(this));
             });
 
-            masterList = new ObservableCollection<Playlist>();
             CrossMediaManager.Current.Init();
 
             //This is the main loop of the app.
@@ -45,6 +95,9 @@ namespace GPSBasedMusicPlayer
             {
                 Task.Run(async () =>
                 {
+                    //save data
+                    //save();
+
                     //update current position
                     Position currentPos = await MapPageViewModel.updateCurrentLocation();
                     List<GeoZone> newZones = new List<GeoZone>();
@@ -119,5 +172,27 @@ namespace GPSBasedMusicPlayer
         public Command MapMenuCommand { get; }
 
         public Command MusicMenuCommand { get; }
+
+        public void save()
+        {
+            string file = Path.Combine(FileSystem.AppDataDirectory + "/data.json");
+
+            Dictionary<string, string> serZones = new Dictionary<string, string>();
+            foreach(GeoZone z in zoneList.Keys)
+            {
+                string zone = JsonConvert.SerializeObject(z);
+                List<string> lists = new List<string>();
+                foreach(Playlist p in zoneList[z])
+                {
+                    string s = p.serialize();
+                    lists.Add(s);
+                }
+                serZones.Add(zone, JsonConvert.SerializeObject(lists));
+            }
+
+            string jsonfile = JsonConvert.SerializeObject(serZones, Formatting.Indented);
+
+            File.WriteAllText(file, jsonfile);
+        }
     }
 }

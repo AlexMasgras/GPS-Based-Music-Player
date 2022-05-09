@@ -28,7 +28,7 @@ namespace GPSBasedMusicPlayer
             {
                 foreach(Playlist p in l)
                 {
-                    if(p.Count > 0)
+                    if(p.Size() > 0)
                     {
                         foreach(string t in p.getRefList())
                         {

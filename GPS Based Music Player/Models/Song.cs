@@ -43,6 +43,16 @@ namespace GPSBasedMusicPlayer
             name = s;
         }
 
+        public override bool Equals(object obj)
+        {
+            if(obj.GetType() != typeof(Song))
+            {
+                return false;
+            }
+
+            return type == ((Song)obj).GetType() && reference.Equals(((Song)obj).GetRef()) && name.Equals(((Song)obj).ToString());
+        }
+
         public override string ToString()
         {
             return name;
