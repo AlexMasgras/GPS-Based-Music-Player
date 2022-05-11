@@ -66,6 +66,10 @@ namespace GPSBasedMusicPlayer
                         }
                     }
                     zoneList.Add(zone, lists);
+                    if(zone.type.Equals("REFERENCE"))
+                    {
+                        refZone = zone;
+                    }
                 }
             }
             else
