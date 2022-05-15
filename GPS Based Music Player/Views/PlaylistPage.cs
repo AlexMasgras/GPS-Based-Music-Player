@@ -11,9 +11,11 @@ namespace GPSBasedMusicPlayer
     {
         Button newButton;
         ListView songs;
+        Playlist context;
         public PlaylistPage(Playlist list)
         {
             BindingContext = new PlaylistPageViewModel(list);
+            context = list;
 
             BackgroundColor = Color.DarkGray;
 
@@ -27,7 +29,7 @@ namespace GPSBasedMusicPlayer
             newButton.SetBinding(Button.CommandProperty, nameof(MusicPageViewModel.AddNew));
 
             songs = new ListView();
-            songs.ItemsSource = list.getSongs();
+            songs.ItemsSource = list.songs;
             songs.ItemTapped += OnTap;
 
             var grid = new Grid
@@ -56,8 +58,13 @@ namespace GPSBasedMusicPlayer
             if(action.Equals("Rename"))
             {
                 action = await DisplayPromptAsync("Rename Playlist", "New Name: ");
+                await PlaylistPageViewModel.SongMenu((Song)e.Item, context, action);
+                songs.ItemsSource = null;
+                songs.ItemsSource = context.songs;
+                return;
             }
-            PlaylistPageViewModel.SongMenu((Song)e.Item, (Playlist)songs.ItemsSource, action);
+            await PlaylistPageViewModel.SongMenu((Song)e.Item, context, action);
+
         }
     }
 }

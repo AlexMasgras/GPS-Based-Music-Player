@@ -2,22 +2,22 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 using Newtonsoft.Json;
 
 namespace GPSBasedMusicPlayer
 {
-    public class Playlist : INotifyCollectionChanged
+    public class Playlist
     {
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
         public string name { get; set; }
         public int position { get; set; }
 
         private List<string> refList;
         private List<GeoZone> boundZones;
-        public List<Song> songs;
+        public ObservableCollection<Song> songs;
 
         public Playlist(string name)
         {
@@ -25,7 +25,7 @@ namespace GPSBasedMusicPlayer
             position = 0;
             refList = new List<string>();
             boundZones = new List<GeoZone>();
-            songs = new List<Song>();
+            songs = new ObservableCollection<Song>();
         }
 
         public Playlist(List<string> jsondata)
@@ -36,7 +36,7 @@ namespace GPSBasedMusicPlayer
             position = int.Parse(jsondata[0]);
             jsondata.RemoveAt(0);
 
-            songs = new List<Song>();
+            songs = new ObservableCollection<Song>();
             refList = new List<string>();
             foreach (String t in jsondata)
             {
@@ -51,7 +51,6 @@ namespace GPSBasedMusicPlayer
         public void Add(Song s)
         {
             songs.Add(s);
-            CollectionChanged.Invoke(this, new NotifyCollectionChangedEventArgs(0, s));
             refList.Add(s.GetRef());
         }
 
@@ -59,7 +58,6 @@ namespace GPSBasedMusicPlayer
         {
             refList.RemoveAt(songs.IndexOf(s));
             songs.Remove(s);
-            CollectionChanged.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, this));
         }
 
         public int Size()
@@ -74,7 +72,7 @@ namespace GPSBasedMusicPlayer
 
         public void onSongRename(Song s)
         {
-            CollectionChanged.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, s, s));
+            
         }
 
         public void onZoneBind(GeoZone z)

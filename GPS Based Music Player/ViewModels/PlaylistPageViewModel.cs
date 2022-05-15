@@ -62,12 +62,11 @@ namespace GPSBasedMusicPlayer
             return videoFile;
         }
 
-        public static async void SongMenu(Song s, Playlist p, string action)
+        public static async Task SongMenu(Song s, Playlist p, string action)
         {
             if (action.Equals("Yeet"))
             {
                 p.Remove(s);
-                s = null;
             }
             else if (action.Equals("Play"))
             {

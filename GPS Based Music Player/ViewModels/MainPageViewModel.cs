@@ -29,6 +29,7 @@ namespace GPSBasedMusicPlayer
             masterList = new ObservableCollection<Playlist>();
             currentZones = new List<GeoZone>();
 
+            
             //deserialize
             if (File.Exists(Path.Combine(FileSystem.AppDataDirectory + "/data.json")))
             {
@@ -91,7 +92,7 @@ namespace GPSBasedMusicPlayer
             });
 
             CrossMediaManager.Current.Init();
-
+            
             //This is the main loop of the app.
             //Every seven seconds, it checks the user's location, and sees if they're in any zones.
             //If so, it plays the shuffled sum of playlists from all zones the user is in.
