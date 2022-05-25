@@ -11,10 +11,9 @@ namespace GPSBasedMusicPlayer
     {
         Button newButton;
         ListView playlists;
-        MainPageViewModel baseModel;
-        public MusicPage(MainPageViewModel model)
+        MusicPageViewModel baseModel;
+        public MusicPage(MusicPageViewModel model)
         {
-            BindingContext = new MusicPageViewModel(model);
             baseModel = model;
 
             BackgroundColor = Color.DarkGray;
@@ -29,8 +28,8 @@ namespace GPSBasedMusicPlayer
             newButton.SetBinding(Button.CommandProperty, nameof(MusicPageViewModel.AddNew));
 
             playlists = new ListView();
-            playlists.ItemsSource = model.masterList;
-            playlists.ItemTapped += OnTap;
+            playlists.ItemsSource = model.getMaster;
+            playlists.ItemTapped += model.OnTap;
 
             var grid = new Grid
             {
@@ -51,40 +50,6 @@ namespace GPSBasedMusicPlayer
             grid.Children.Add(playlists, 0, 1);
 
             Content = grid;
-        }
-        async void OnTap(object sender, ItemTappedEventArgs e)
-        {
-            string action = await DisplayActionSheet("Playlist: " + e.Item.ToString(), "Cancel", "Delete", "Edit", "Rename", "Play", "Assign to Zone", "Unassign from Zone");
-            GeoZone z = null;
-            if(action.Equals("Assign to Zone") || action.Equals("Unassign from Zone"))
-            {
-                MessagingCenter.Subscribe<ZoneSelectionMenu, GeoZone>(this, "a", (send, arg) =>
-                {
-                    MusicPageViewModel.PlaylistMenu((Playlist)e.Item, baseModel, action, arg);
-                    MessagingCenter.Unsubscribe<ZoneSelectionMenu, GeoZone>(this, "a");
-                });
-
-                bool add = action.Equals("Assign to Zone");
-                List<GeoZone> list = add ? new List<GeoZone>(baseModel.zoneList.Keys.ToList()) : ((Playlist)e.Item).getBoundZones();
-
-                if(add)
-                {
-                    List<GeoZone> toDisplay = new List<GeoZone>();
-                    foreach (GeoZone zone in list)
-                    {
-                        if(zone.ToString() != null && !((Playlist)e.Item).getBoundZones().Contains(zone))
-                        {
-                            toDisplay.Add(zone);
-                        }
-                    }
-                    list = toDisplay;
-                }
-
-                ZoneSelectionMenu zoneMenu = new ZoneSelectionMenu(list, add);
-                await Application.Current.MainPage.Navigation.PushModalAsync(zoneMenu);
-                return;
-            }
-            MusicPageViewModel.PlaylistMenu((Playlist)e.Item, baseModel, action, z);
         }
     }
 }

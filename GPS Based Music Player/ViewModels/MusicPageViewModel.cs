@@ -9,22 +9,63 @@ namespace GPSBasedMusicPlayer
 {
     public class MusicPageViewModel : ContentPage
     {
-        public MusicPageViewModel(MainPageViewModel model)
+        private App app;
+        public MusicPageViewModel(App model)
         {
             AddNew = new Command( async () =>
             {
                 string result = await Application.Current.MainPage.DisplayPromptAsync("Playlist Creation", "Name your Playlist");
                 Playlist p = new Playlist(result);
                 model.masterList.Add(p);
-                model.zoneList[model.refZone].Add(p);
+                model.addToRef(p);
                 model.save();
             });
-            
+
+            app = model;
         }
 
         public Command AddNew { get; }
 
-        public static async void PlaylistMenu(Playlist p, MainPageViewModel context, string action, GeoZone z)
+        public IList<Playlist> getMaster { get => app.masterList; }
+
+        public Command ButtonPressed { get; }
+
+        public async void OnTap(object sender, ItemTappedEventArgs e)
+        {
+            string action = await DisplayActionSheet("Playlist: " + e.Item.ToString(), "Cancel", "Delete", "Edit", "Rename", "Play", "Assign to Zone", "Unassign from Zone");
+            GeoZone z = null;
+            if (action.Equals("Assign to Zone") || action.Equals("Unassign from Zone"))
+            {
+                MessagingCenter.Subscribe<ZoneSelectionMenu, GeoZone>(this, "a", (send, arg) =>
+                {
+                    PlaylistMenu((Playlist)e.Item, app, action, arg);
+                    MessagingCenter.Unsubscribe<ZoneSelectionMenu, GeoZone>(this, "a");
+                });
+
+                bool add = action.Equals("Assign to Zone");
+                List<GeoZone> list = add ? new List<GeoZone>(app.zoneList.Keys.ToList()) : ((Playlist)e.Item).getBoundZones();
+
+                if (add)
+                {
+                    List<GeoZone> toDisplay = new List<GeoZone>();
+                    foreach (GeoZone zone in list)
+                    {
+                        if (zone.ToString() != null && !((Playlist)e.Item).getBoundZones().Contains(zone))
+                        {
+                            toDisplay.Add(zone);
+                        }
+                    }
+                    list = toDisplay;
+                }
+
+                ZoneSelectionMenu zoneMenu = new ZoneSelectionMenu(list, add);
+                await Application.Current.MainPage.Navigation.PushModalAsync(zoneMenu);
+                return;
+            }
+            PlaylistMenu((Playlist)e.Item, app, action, z);
+        }
+
+        public static async void PlaylistMenu(Playlist p, App context, string action, GeoZone z)
         {
             if (action.Equals("Edit"))
             {

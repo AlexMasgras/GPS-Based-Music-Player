@@ -12,15 +12,13 @@ namespace GPSBasedMusicPlayer
 {
     public class MapPageViewModel : ContentView
     {
-        private static double latitude;
-        private static double longitude;
         public Xamarin.Forms.Maps.Map map;
-        private MainPageViewModel model;
+        private App model;
         private string buttonMode;
         private List<Position> addPointsList;
         private Polyline tempLine;
 
-        public MapPageViewModel(MainPageViewModel model, Position pos)
+        public MapPageViewModel(App model, Position pos)
         {
             MapSpan mapSpan = new MapSpan(pos, 0.01, 0.01);
             buttonMode = "newZone";
@@ -45,13 +43,13 @@ namespace GPSBasedMusicPlayer
                 ButtonPressed();
             });
 
-            foreach(KeyValuePair<GeoZone, List<Playlist>> entry in model.zoneList)
+            foreach (KeyValuePair<GeoZone, List<Playlist>> entry in model.zoneList)
             {
                 if (entry.Key.type.Equals("Circle"))
                 {
                     drawCircle(entry.Key.coords);
                 }
-                else if(entry.Key.type.Equals("Polygon"))
+                else if (entry.Key.type.Equals("Polygon"))
                 {
                     drawPolygon(entry.Key.coords);
                 }
@@ -83,7 +81,7 @@ namespace GPSBasedMusicPlayer
             }
             else if (buttonMode.Equals("Circle"))
             {
-                if(addPointsList.Count < 2)
+                if (addPointsList.Count < 2)
                 {
                     await Application.Current.MainPage.DisplayAlert("Error", "Too few points: cancelled", "OK");
                 }
@@ -111,11 +109,11 @@ namespace GPSBasedMusicPlayer
 
         public void OnMapClicked(object sender, MapClickedEventArgs e)
         {
-            if(buttonMode.Equals("newZone"))
+            if (buttonMode.Equals("newZone"))
             {
                 return;
             }
-            else if(buttonMode.Equals("Circle"))
+            else if (buttonMode.Equals("Circle"))
             {
                 addPointsList.Add(e.Position);
                 tempLine.Geopath.Add(e.Position);
@@ -125,21 +123,18 @@ namespace GPSBasedMusicPlayer
                     ButtonPressed();
                 }
             }
-            else if(buttonMode.Equals("Polygon"))
+            else if (buttonMode.Equals("Polygon"))
             {
                 addPointsList.Add(e.Position);
                 tempLine.Geopath.Add(e.Position);
             }
         }
-        public static Position getLatLong()
-        {
-            return new Position(latitude, longitude);
-        }
         public static async Task<Position> updateCurrentLocation()
         {
             try
             {
-                var location = await Geolocation.GetLastKnownLocationAsync();
+                var request = new GeolocationRequest(GeolocationAccuracy.High, TimeSpan.FromSeconds(10));
+                var location = await Geolocation.GetLocationAsync(request);
 
                 if (location != null)
                 {
@@ -163,7 +158,7 @@ namespace GPSBasedMusicPlayer
             {
                 Console.WriteLine(ex);
             }
-            return new Position(0,0);
+            return new Position(0, 0);
         }
 
 
@@ -175,7 +170,7 @@ namespace GPSBasedMusicPlayer
                 StrokeColor = Color.FromHex("#1BA1E2"),
                 FillColor = Color.FromHex("#881BA1E2"),
             };
-            foreach(Position pos in p)
+            foreach (Position pos in p)
             {
                 polygon.Geopath.Add(pos);
             }
@@ -186,7 +181,7 @@ namespace GPSBasedMusicPlayer
         {
             drawPolygon(p);
 
-            GeoZone zone = new GeoZone(name, "Polygon", new List<Position>(p));
+            GeoZone zone = new GeoZone(name, ZoneType.POLYGON, new List<Position>(p));
             model.AddZone(zone);
             model.save();
         }
@@ -208,7 +203,7 @@ namespace GPSBasedMusicPlayer
         {
             drawCircle(p);
 
-            GeoZone zone = new GeoZone(name, "Circle", new List<Position>(p));
+            GeoZone zone = new GeoZone(name, ZoneType.CIRCLE, new List<Position>(p));
             model.AddZone(zone);
             model.save();
         }

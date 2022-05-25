@@ -13,9 +13,9 @@ namespace GPSBasedMusicPlayer
     {
         Button addButton;
         public MapPageViewModel cxt;
-        public MapPage(MainPageViewModel model, Position pos)
+        public MapPage(MapPageViewModel model)
         {
-            cxt = new MapPageViewModel(model, pos);
+            cxt = model;
             BindingContext = cxt;
 
             addButton = new Button
@@ -41,7 +41,7 @@ namespace GPSBasedMusicPlayer
                 },
                 RowDefinitions =
                 {
-                    
+
                     new RowDefinition { Height = new GridLength(9, GridUnitType.Star) },
                     new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }
                 }

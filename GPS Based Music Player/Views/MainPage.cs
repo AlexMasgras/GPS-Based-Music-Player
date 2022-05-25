@@ -15,11 +15,10 @@ namespace GPSBasedMusicPlayer
         Label zoneLabel;
         Button mapButton;
         Button musicButton;
-        public MainPage()
+        public MainPage(App app)
         {
+            BindingContext = new MainPageViewModel(app);
             BackgroundColor = Color.DarkGray;
-
-            BindingContext = new MainPageViewModel();
 
             logoImage = new Image
             {
@@ -50,7 +49,7 @@ namespace GPSBasedMusicPlayer
                 FontSize = 20,
                 Margin = new Thickness(1)
             };
-            //songLabel.SetBinding(Label.TextProperty, nameof(MainPageViewModel.CurrentSong));
+            songLabel.SetBinding(Label.TextProperty, "Now Playing: " + nameof(MainPageViewModel.CurrentSong));
 
             zoneLabel = new Label
             {
@@ -58,6 +57,7 @@ namespace GPSBasedMusicPlayer
                 FontSize = 20,
                 Margin = new Thickness(1)
             };
+            zoneLabel.SetBinding(Label.TextProperty, "Zone: " + nameof(MainPageViewModel.CurrentZone));
 
             timeLabel = new Label
             {
@@ -65,6 +65,7 @@ namespace GPSBasedMusicPlayer
                 FontSize = 20,
                 Margin = new Thickness(1)
             };
+            //timeLabel.SetBinding(Label.TextProperty, System.time);
 
             var grid = new Grid
             {

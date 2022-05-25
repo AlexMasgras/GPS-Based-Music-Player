@@ -6,10 +6,9 @@
     {
         public string name { get; set; }
         public List<Position> coords { get; set; }
+        public ZoneType type { get; set; }
 
-        public string type { get; set; }
-
-        public GeoZone(string name, string type, List<Position> coords)
+        public GeoZone(string name, ZoneType type, List<Position> coords)
         {
             this.name = name;
             this.coords = coords;
