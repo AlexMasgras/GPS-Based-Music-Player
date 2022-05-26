@@ -23,24 +23,34 @@ namespace GPSBasedMusicPlayer
 
         async void ButtonClicked(Playlist list)
         {
-            //try
-            //{
-                SongType type = SongTypeMethods.ToSongType(await Application.Current.MainPage.DisplayActionSheet("Type of song?", "Cancel", null, "File", "Soundcloud", "Bandcamp"));
-                var result = await FilePicker.PickAsync();
-                string name = await Application.Current.MainPage.DisplayPromptAsync("New Song", "Name of song?");
-
-                if(result != null)
+            try
+            {
+                SongType type = SongTypeMethods.ToSongType(await Application.Current.MainPage.DisplayActionSheet("Type of song?", "Cancel", null, "File", "Soundcloud"));
+                if (type == SongType.FILE)
                 {
-                    list.Add(new Song(type, name, await StoreAudioFile(result.OpenReadAsync(), name)));
-                }
+                    var result = await FilePicker.PickAsync();
+                    string name = await Application.Current.MainPage.DisplayPromptAsync("New Song", "Name of song?");
 
-            //}
-#pragma warning disable CS0168 // Variable is declared but never used
-            //catch (Exception ex)
-#pragma warning restore CS0168 // Variable is declared but never used
-            //{
+                    if (result != null)
+                    {
+                        list.Add(new Song(type, name, await StoreAudioFile(result.OpenReadAsync(), name)));
+                    }
+                }
+                else if(type == SongType.SOUNDCLOUD)
+                {
+                    MessagingCenter.Subscribe<SearchPageViewModel, string>(this, "soundcloud", (send, arg) =>
+                    {
+                        list.Add(new Song(type, "hello world", arg));
+                        MessagingCenter.Unsubscribe<SearchPageViewModel, string>(this, "a");
+                    });
+                }
+            }
+            #pragma warning disable CS0168 // Variable is declared but never used
+            catch (Exception ex)
+            #pragma warning restore CS0168 // Variable is declared but never used
+            {
                 // The user canceled or something went wrong
-            //}
+            }
         }
 
         public Command AddNew { get; }

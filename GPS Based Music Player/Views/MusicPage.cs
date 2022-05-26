@@ -55,7 +55,6 @@ namespace GPSBasedMusicPlayer
         async void OnTap(object sender, ItemTappedEventArgs e)
         {
             string action = await DisplayActionSheet("Playlist: " + e.Item.ToString(), "Cancel", "Delete", "Edit", "Rename", "Play", "Assign to Zone", "Unassign from Zone");
-            GeoZone z = null;
             if(action.Equals("Assign to Zone") || action.Equals("Unassign from Zone"))
             {
                 MessagingCenter.Subscribe<ZoneSelectionMenu, GeoZone>(this, "a", (send, arg) =>
@@ -84,7 +83,7 @@ namespace GPSBasedMusicPlayer
                 await Application.Current.MainPage.Navigation.PushModalAsync(zoneMenu);
                 return;
             }
-            MusicPageViewModel.PlaylistMenu((Playlist)e.Item, baseModel, action, z);
+            MusicPageViewModel.PlaylistMenu((Playlist)e.Item, baseModel, action, null);
         }
     }
 }
