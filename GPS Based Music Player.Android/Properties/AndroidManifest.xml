@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="alpha 1.0" package="com.minnick.codeduinav" android:installLocation="internalOnly">
-	<uses-sdk android:minSdkVersion="28" android:targetSdkVersion="30" />
-	<application android:label="CodedUINav.Android" android:icon="@mipmap/icon">
-		<meta-data android:name="com.google.android.geo.API_KEY" android:value="no" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="alpha 1.0" package="com.minnick.gpsplayer" android:installLocation="internalOnly">
+	<uses-sdk android:minSdkVersion="25" android:targetSdkVersion="30" />
+	<application android:label="GPS-Based Music Player" android:icon="@mipmap/icon">
+		<meta-data android:name="com.google.android.geo.API_KEY" android:value="" />
 		<meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 		<uses-library android:name="org.apache.http.legacy" android:required="false" />
 	</application>
