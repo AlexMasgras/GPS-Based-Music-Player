@@ -21,14 +21,6 @@ namespace GPSBasedMusicPlayer
             {
                 return SongType.FILE;
             }
-            else if (type.ToLower().Equals("soundcloud"))
-            {
-                return SongType.SOUNDCLOUD;
-            }
-            else if (type.ToLower().Equals("bandcamp"))
-            {
-                return SongType.BANDCAMP;
-            }
 
             return SongType.INVALID;
         }

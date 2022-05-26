@@ -25,7 +25,7 @@ namespace GPSBasedMusicPlayer
         {
             //try
             //{
-                SongType type = SongTypeMethods.ToSongType(await Application.Current.MainPage.DisplayActionSheet("Type of song?", "Cancel", null, "File", "Soundcloud", "Bandcamp"));
+                SongType type = SongTypeMethods.ToSongType(await Application.Current.MainPage.DisplayActionSheet("Type of song?", "Cancel", null, "File"));
                 var result = await FilePicker.PickAsync();
                 string name = await Application.Current.MainPage.DisplayPromptAsync("New Song", "Name of song?");
 
